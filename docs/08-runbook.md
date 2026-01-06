@@ -8,9 +8,16 @@
 
 ### Steps
 1) `cp .env.example .env`
-2) `docker compose up -d`
-3) run migrations (tooling depends on chosen ORM/migration tool)
-4) `pnpm dev`
+2) `docker compose -f infra/docker/docker-compose.yml up -d`
+3) `pnpm db:generate`
+4) `pnpm db:migrate`
+5) `pnpm dev`
+
+### Manual checks
+- Health check:
+  - `curl http://127.0.0.1:3000/api/health`
+- Create room:
+  - `curl -X POST http://127.0.0.1:3000/api/host/rooms -H "content-type: application/json" -d '{"title":"demo"}'`
 
 ## 2. Environments
 - Development: local Postgres

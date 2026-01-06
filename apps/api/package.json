@@ -16,6 +16,8 @@
   "dependencies": {
     "@hono/node-server": "^1.19.7",
     "hono": "^4.11.3",
+    "@flash-vote/db": "workspace:*",
+    "shared": "workspace:*",
     "zod": "^4.3.5"
   },
   "devDependencies": {
