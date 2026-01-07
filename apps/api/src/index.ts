@@ -1,12 +1,31 @@
 import { Hono } from "hono";
-import { randomBytes, createHash, randomUUID } from "node:crypto";
+import { randomBytes, createHmac, randomUUID } from "node:crypto";
 import { db, rooms } from "@flash-vote/db";
 import { createRoomRequestSchema } from "shared";
 
 const app = new Hono();
 
-app.onError((err, c) => {
+app.use("*", async (c, next) => {
   const requestId = randomUUID();
+  const start = Date.now();
+  c.set("requestId", requestId);
+  c.header("x-request-id", requestId);
+
+  try {
+    await next();
+  } finally {
+    const url = new URL(c.req.url);
+    const status = c.res.status;
+    const length = c.res.headers.get("content-length") ?? "-";
+    const durationMs = Date.now() - start;
+    console.log(
+      `[${requestId}] ${c.req.method} ${url.pathname}${url.search} -> ${status} ${durationMs}ms ${length}`
+    );
+  }
+});
+
+app.onError((err, c) => {
+  const requestId = c.get("requestId") ?? randomUUID();
   console.error(`[${requestId}]`, err);
   return c.json(
     {
@@ -59,8 +78,8 @@ app.post("/api/host/rooms", async (c) => {
   }
 
   const hostToken = randomBytes(32).toString("hex");
-  const hostTokenHash = createHash("sha256")
-    .update(`${hostToken}${pepper}`)
+  const hostTokenHash = createHmac("sha256", pepper)
+    .update(hostToken)
     .digest("hex");
 
   const [room] = await db
@@ -72,7 +91,7 @@ app.post("/api/host/rooms", async (c) => {
     })
     .returning({ id: rooms.id, status: rooms.status });
 
-  const webBaseUrl = process.env.WEB_BASE_URL ?? "http://127.0.0.1:5173";
+  const webBaseUrl = process.env.WEB_BASE_URL ?? "http://127.0.0.1:4173";
   const hostManagementUrl = new URL(`/host/${room.id}`, webBaseUrl);
   hostManagementUrl.searchParams.set("token", hostToken);
   const publicUrl = new URL(`/r/${room.id}`, webBaseUrl);
