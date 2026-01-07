@@ -10,12 +10,21 @@ importers:
 
   apps/api:
     dependencies:
+      '@flash-vote/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@hono/node-server':
         specifier: ^1.19.7
         version: 1.19.7(hono@4.11.3)
+      dotenv:
+        specifier: ^16.6.1
+        version: 16.6.1
       hono:
         specifier: ^4.11.3
         version: 4.11.3
+      shared:
+        specifier: workspace:*
+        version: link:../../packages/shared
       zod:
         specifier: ^4.3.5
         version: 4.3.5
