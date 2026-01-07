@@ -67,11 +67,14 @@ const parseOptions = (value: string) =>
     .map((option) => option.trim())
     .filter((option) => option.length > 0);
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://127.0.0.1:3000";
+
 const apiFetch = async (input: string, init?: RequestInit) => {
   if (!authToken.value) {
     throw new Error("Host tokenがありません。");
   }
-  const response = await fetch(input, {
+  const url = new URL(input, apiBaseUrl).toString();
+  const response = await fetch(url, {
     ...init,
     headers: {
       "content-type": "application/json",
@@ -88,6 +91,10 @@ const apiFetch = async (input: string, init?: RequestInit) => {
       // ignore
     }
     throw new Error(message);
+  }
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("API応答がJSONではありません。API_BASE_URLの設定を確認してください。");
   }
   return response;
 };
