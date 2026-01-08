@@ -496,6 +496,15 @@ app.patch("/api/host/questions/:questionId", async (c) => {
     return jsonError(c, 400, "VALIDATION_ERROR", "Text questions cannot have options");
   }
 
+  if (parsed.data.options && auth.question.type !== "text" && parsed.data.options.length === 0) {
+    return jsonError(
+      c,
+      400,
+      "VALIDATION_ERROR",
+      "Choice questions must include at least one option"
+    );
+  }
+
   await db.transaction(async (tx) => {
     if (parsed.data.options) {
       await tx.delete(options).where(eq(options.questionId, questionId));
