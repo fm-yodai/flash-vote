@@ -74,14 +74,20 @@ const apiFetch = async (input: string, init?: RequestInit) => {
     throw new Error("Host tokenがありません。");
   }
   const url = new URL(input, apiBaseUrl).toString();
-  const response = await fetch(url, {
-    ...init,
-    headers: {
-      "content-type": "application/json",
-      Authorization: `Bearer ${authToken.value}`,
-      ...(init?.headers ?? {}),
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...init,
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${authToken.value}`,
+        ...(init?.headers ?? {}),
+      },
+    });
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "unknown error";
+    throw new Error(`APIに接続できません (${detail}). VITE_API_BASE_URL: ${apiBaseUrl}`);
+  }
   if (!response.ok) {
     let message = `Request failed (${response.status})`;
     try {
