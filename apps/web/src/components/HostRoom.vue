@@ -67,7 +67,9 @@ const parseOptions = (value: string) =>
     .map((option) => option.trim())
     .filter((option) => option.length > 0);
 
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://127.0.0.1:3000";
+const apiBaseUrl =
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
+  `${window.location.protocol}//${window.location.hostname}:3000`;
 
 const apiFetch = async (input: string, init?: RequestInit) => {
   if (!authToken.value) {
@@ -97,6 +99,9 @@ const apiFetch = async (input: string, init?: RequestInit) => {
       // ignore
     }
     throw new Error(message);
+  }
+  if (response.status === 204 || response.headers.get("content-length") === "0") {
+    return response;
   }
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) {

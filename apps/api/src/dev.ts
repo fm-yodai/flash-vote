@@ -12,6 +12,7 @@ import("./index")
     serve({
       fetch: app.fetch,
       port,
+      hostname: "0.0.0.0",
     });
 
     console.log(`API listening on http://127.0.0.1:${port}`);

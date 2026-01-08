@@ -1,4 +1,5 @@
 import { Hono, type Context } from "hono";
+import { cors } from "hono/cors";
 import {
   createHmac,
   randomBytes,
@@ -22,6 +23,14 @@ import {
 import { eq, inArray, sql } from "drizzle-orm";
 
 const app = new Hono();
+
+app.use(
+  "*",
+  cors({
+    origin: "*",
+    allowHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 const jsonError = (
   c: Context,
