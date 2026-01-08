@@ -9,25 +9,16 @@ import {
   uniqueIndex,
   index,
 } from "drizzle-orm/pg-core";
-import { RoomStatus } from "shared";
+import { QuestionStatus, QuestionType, RoomStatus } from "shared";
 
 /**
  * Enums
  */
 export const roomStatusEnum = pgEnum("room_status", RoomStatus);
 
-export const questionTypeEnum = pgEnum("question_type", [
-  "single_choice",
-  "multi_choice",
-  "text",
-]);
+export const questionTypeEnum = pgEnum("question_type", QuestionType);
 
-export const questionStatusEnum = pgEnum("question_status", [
-  "not_open",
-  "accepting",
-  "closed",
-  "showing_results",
-]);
+export const questionStatusEnum = pgEnum("question_status", QuestionStatus);
 
 export const responseTypeEnum = pgEnum("response_type", ["choice", "text"]);
 
